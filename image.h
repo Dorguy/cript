@@ -1,10 +1,10 @@
-#include <fstream> //библиотека для работы с файлами
+#include <fstream> //ГЎГЁГЎГ«ГЁГ®ГІГҐГЄГ  Г¤Г«Гї Г°Г ГЎГ®ГІГ» Г± ГґГ Г©Г«Г Г¬ГЁ
 #include <iostream> 
 using namespace std;
-
-struct Color { //отвечает за пиксели
-    unsigned char red, green, blue; //беззнаковые символы
-    bool operator == (Color& color) { //сравнение двух пикселей
+//k
+struct Color { //Г®ГІГўГҐГ·Г ГҐГІ Г§Г  ГЇГЁГЄГ±ГҐГ«ГЁ
+    unsigned char red, green, blue; //ГЎГҐГ§Г§Г­Г ГЄГ®ГўГ»ГҐ Г±ГЁГ¬ГўГ®Г«Г»
+    bool operator == (Color& color) { //Г±Г°Г ГўГ­ГҐГ­ГЁГҐ Г¤ГўГіГµ ГЇГЁГЄГ±ГҐГ«ГҐГ©
         return red == color.red &&
             blue == color.blue && green == color.green;
     }
@@ -42,7 +42,7 @@ const short WORD = 2;
 
 typedef unsigned __int16 word;
 
-struct BMPheader { //стркутура заголовка фото
+struct BMPheader { //Г±ГІГ°ГЄГіГІГіГ°Г  Г§Г ГЈГ®Г«Г®ГўГЄГ  ГґГ®ГІГ®
     word signature; //2 0x4d42 | 0x4349 | 0x5450
     int fileSize;   //4 
     int reserved;   //4 
@@ -58,7 +58,7 @@ struct BMPheader { //стркутура заголовка фото
     int YpixelsPerM;    //4 vertical resolution, dots in inch
     int ColorUsed;      //4 
     int ColorImportant; //4 
-    void Print(ostream& fout) { //создание заголовка новой фотографии
+    void Print(ostream& fout) { //Г±Г®Г§Г¤Г Г­ГЁГҐ Г§Г ГЈГ®Г«Г®ГўГЄГ  Г­Г®ГўГ®Г© ГґГ®ГІГ®ГЈГ°Г ГґГЁГЁ
         fout.write((char*)&signature, WORD); //2
         fout.write((char*)&fileSize, INT); //4
         fout.write((char*)&reserved, INT);
@@ -78,10 +78,10 @@ struct BMPheader { //стркутура заголовка фото
 };
 
 class Image {
-    BMPheader h; //заголовок фото
-    Color** pixels; //матрица пикселей
+    BMPheader h; //Г§Г ГЈГ®Г«Г®ГўГ®ГЄ ГґГ®ГІГ®
+    Color** pixels; //Г¬Г ГІГ°ГЁГ¶Г  ГЇГЁГЄГ±ГҐГ«ГҐГ©
 public:
-    Image(string fileName) { //конструктор по файлу (считывает с файла)
+    Image(string fileName) { //ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г° ГЇГ® ГґГ Г©Г«Гі (Г±Г·ГЁГІГ»ГўГ ГҐГІ Г± ГґГ Г©Г«Г )
         ifstream fin(fileName, ios::binary);
         fin.seekg(0);
         fin.read((char*)&h.signature, WORD);
@@ -101,18 +101,18 @@ public:
         fin.read((char*)&h.ColorImportant, INT);
 
 
-        pixels = new Color * [h.height]; //динамическая память под матрицу пиксилей
-        int r = (h.width * sizeof(Color)) % 4; //сколько 0 в конце строки
+        pixels = new Color * [h.height]; //Г¤ГЁГ­Г Г¬ГЁГ·ГҐГ±ГЄГ Гї ГЇГ Г¬ГїГІГј ГЇГ®Г¤ Г¬Г ГІГ°ГЁГ¶Гі ГЇГЁГЄГ±ГЁГ«ГҐГ©
+        int r = (h.width * sizeof(Color)) % 4; //Г±ГЄГ®Г«ГјГЄГ® 0 Гў ГЄГ®Г­Г¶ГҐ Г±ГІГ°Г®ГЄГЁ
         int nBytes = r ? 4 - r : 0; //if r == 0
         //pixel reading
         for (int i = 0; i < h.height; i++) {
             pixels[i] = new Color[h.width];
             fin.read((char*)pixels[i], sizeof(Color) * h.width);
-            fin.seekg(nBytes, ios::cur); //пропустить ненужные биты
+            fin.seekg(nBytes, ios::cur); //ГЇГ°Г®ГЇГіГ±ГІГЁГІГј Г­ГҐГ­ГіГ¦Г­Г»ГҐ ГЎГЁГІГ»
         }
     }
 
-    void Print() { //вывод информации о фото
+    void Print() { //ГўГ»ГўГ®Г¤ ГЁГ­ГґГ®Г°Г¬Г Г¶ГЁГЁ Г® ГґГ®ГІГ®
         cout << "Signature: " << h.signature << endl;
         cout << "File size: " << h.fileSize << endl;
         cout << "Offset: " << h.dataOffset << endl;
@@ -125,16 +125,16 @@ public:
         cout << "size image: " << h.imageSize << endl;
         cout << sizeof(Color) << endl;
     }
-    int getWidth() { //геттеры классов
+    int getWidth() { //ГЈГҐГІГІГҐГ°Г» ГЄГ«Г Г±Г±Г®Гў
         return h.width;
     }
     int getHeight() {
         return h.height;
     }
-    void Save(string& fileName) { //сохранение нового файла
-        ofstream fout(fileName, ios::binary); //открыть файл для записи
+    void Save(string& fileName) { //Г±Г®ГµГ°Г Г­ГҐГ­ГЁГҐ Г­Г®ГўГ®ГЈГ® ГґГ Г©Г«Г 
+        ofstream fout(fileName, ios::binary); //Г®ГІГЄГ°Г»ГІГј ГґГ Г©Г« Г¤Г«Гї Г§Г ГЇГЁГ±ГЁ
         // print BMP file header
-        h.Print(fout); //сохранить в файл
+        h.Print(fout); //Г±Г®ГµГ°Г Г­ГЁГІГј Гў ГґГ Г©Г«
 
         // creating '0' to append to the end of BMP file lines
         int r = (h.width * sizeof(Color)) % 4;
@@ -245,7 +245,7 @@ public:
             fout2.write(temp, nBytes);
         }
     }
-    void blur(int blurSize) { // "Размытие" с изменяемой областью(силой)
+    void blur(int blurSize) { // "ГђГ Г§Г¬Г»ГІГЁГҐ" Г± ГЁГ§Г¬ГҐГ­ГїГҐГ¬Г®Г© Г®ГЎГ«Г Г±ГІГјГѕ(Г±ГЁГ«Г®Г©)
         int avgR, avgB, avgG, n;
         for (int xx = 0; xx < h.width; xx++) {
             for (int yy = 0; yy < h.height; yy++) {
