@@ -1,10 +1,10 @@
-#include <fstream> //áèáëèîòåêà äëÿ ðàáîòû ñ ôàéëàìè
+#include <fstream> //библиотека для работы с файлами
 #include <iostream> 
 using namespace std;
-//k
-struct Color { //îòâå÷àåò çà ïèêñåëè
-    unsigned char red, green, blue; //áåççíàêîâûå ñèìâîëû
-    bool operator == (Color& color) { //ñðàâíåíèå äâóõ ïèêñåëåé
+
+struct Color { //отвечает за пиксели
+    unsigned char red, green, blue; //беззнаковые символы
+    bool operator == (Color& color) { //сравнение двух пикселей
         return red == color.red &&
             blue == color.blue && green == color.green;
     }
@@ -42,7 +42,7 @@ const short WORD = 2;
 
 typedef unsigned __int16 word;
 
-struct BMPheader { //ñòðêóòóðà çàãîëîâêà ôîòî
+struct BMPheader { //стркутура заголовка фото
     word signature; //2 0x4d42 | 0x4349 | 0x5450
     int fileSize;   //4 
     int reserved;   //4 
@@ -58,7 +58,7 @@ struct BMPheader { //ñòðêóòóðà çàãîëîâêà ôîòî
     int YpixelsPerM;    //4 vertical resolution, dots in inch
     int ColorUsed;      //4 
     int ColorImportant; //4 
-    void Print(ostream& fout) { //ñîçäàíèå çàãîëîâêà íîâîé ôîòîãðàôèè
+    void Print(ostream& fout) { //создание заголовка новой фотографии
         fout.write((char*)&signature, WORD); //2
         fout.write((char*)&fileSize, INT); //4
         fout.write((char*)&reserved, INT);
@@ -78,10 +78,10 @@ struct BMPheader { //ñòðêóòóðà çàãîëîâêà ôîòî
 };
 
 class Image {
-    BMPheader h; //çàãîëîâîê ôîòî
-    Color** pixels; //ìàòðèöà ïèêñåëåé
+    BMPheader h; //заголовок фото
+    Color** pixels; //матрица пикселей
 public:
-    Image(string fileName) { //êîíñòðóêòîð ïî ôàéëó (ñ÷èòûâàåò ñ ôàéëà)
+    Image(string fileName) { //конструктор по файлу (считывает с файла)
         ifstream fin(fileName, ios::binary);
         fin.seekg(0);
         fin.read((char*)&h.signature, WORD);
@@ -101,18 +101,18 @@ public:
         fin.read((char*)&h.ColorImportant, INT);
 
 
-        pixels = new Color * [h.height]; //äèíàìè÷åñêàÿ ïàìÿòü ïîä ìàòðèöó ïèêñèëåé
-        int r = (h.width * sizeof(Color)) % 4; //ñêîëüêî 0 â êîíöå ñòðîêè
+        pixels = new Color * [h.height]; //динамическая память под матрицу пиксилей
+        int r = (h.width * sizeof(Color)) % 4; //сколько 0 в конце строки
         int nBytes = r ? 4 - r : 0; //if r == 0
         //pixel reading
         for (int i = 0; i < h.height; i++) {
             pixels[i] = new Color[h.width];
             fin.read((char*)pixels[i], sizeof(Color) * h.width);
-            fin.seekg(nBytes, ios::cur); //ïðîïóñòèòü íåíóæíûå áèòû
+            fin.seekg(nBytes, ios::cur); //пропустить ненужные биты
         }
     }
 
-    void Print() { //âûâîä èíôîðìàöèè î ôîòî
+    void Print() { //вывод информации о фото
         cout << "Signature: " << h.signature << endl;
         cout << "File size: " << h.fileSize << endl;
         cout << "Offset: " << h.dataOffset << endl;
@@ -125,16 +125,16 @@ public:
         cout << "size image: " << h.imageSize << endl;
         cout << sizeof(Color) << endl;
     }
-    int getWidth() { //ãåòòåðû êëàññîâ
+    int getWidth() { //геттеры классов
         return h.width;
     }
     int getHeight() {
         return h.height;
     }
-    void Save(string& fileName) { //ñîõðàíåíèå íîâîãî ôàéëà
-        ofstream fout(fileName, ios::binary); //îòêðûòü ôàéë äëÿ çàïèñè
+    void Save(string& fileName) { //сохранение нового файла
+        ofstream fout(fileName, ios::binary); //открыть файл для записи
         // print BMP file header
-        h.Print(fout); //ñîõðàíèòü â ôàéë
+        h.Print(fout); //сохранить в файл
 
         // creating '0' to append to the end of BMP file lines
         int r = (h.width * sizeof(Color)) % 4;
@@ -245,7 +245,7 @@ public:
             fout2.write(temp, nBytes);
         }
     }
-    void blur(int blurSize) { // "Ðàçìûòèå" ñ èçìåíÿåìîé îáëàñòüþ(ñèëîé)
+    void blur(int blurSize) { // "Размытие" с изменяемой областью(силой)
         int avgR, avgB, avgG, n;
         for (int xx = 0; xx < h.width; xx++) {
             for (int yy = 0; yy < h.height; yy++) {
