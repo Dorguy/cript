@@ -1,4 +1,4 @@
-﻿#include "image.h" //подключаем заголовочный файл
+#include "image.h" //подключаем заголовочный файл
 void print_menu(); //"Меню"
 int get_variant(int count, int& variant); //Выбранное пользователем действие
 int main()
